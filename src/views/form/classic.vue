@@ -56,7 +56,7 @@ export default {
 	data() {
 		return {
 			labelCol: { span: 4 },
-			wrapperCol: { span: 14 },
+			wrapperCol: { span: 8 },
 			form: {
 				name: '',
 				region: undefined,

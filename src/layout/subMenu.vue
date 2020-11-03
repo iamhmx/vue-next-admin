@@ -6,7 +6,9 @@
 	<a-sub-menu :key="route.name">
 		<template v-slot:title>
 			<span
-				><MailOutlined /><span>{{ route.meta.title }}</span></span
+				><component :is="route.meta.icon" /><span>{{
+					route.meta.title
+				}}</span></span
 			>
 		</template>
 		<template v-for="item in route.children">
@@ -14,7 +16,7 @@
 				v-if="!item.children || item.children.length === 0"
 				:key="item.name"
 			>
-				<MailOutlined />
+				<component :is="item.meta.icon" />
 				<span>{{ item.meta.title }}</span>
 			</a-menu-item>
 			<sub-menu v-else :key="item.name" :route="item" />
@@ -23,11 +25,11 @@
 </template>
 
 <script>
-import { MailOutlined } from '@ant-design/icons-vue'
+import { ContainerOutlined } from '@ant-design/icons-vue'
 export default {
 	name: 'SubMenu',
 	components: {
-		MailOutlined
+		ContainerOutlined
 	},
 	props: {
 		route: {

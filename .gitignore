@@ -5,3 +5,4 @@ dist
 .vscode
 nginx
 docker-compose.yml
+yarn-error.log

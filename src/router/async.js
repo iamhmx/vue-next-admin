@@ -14,21 +14,21 @@ export default [
 				name: 'Dashboard',
 				component: () => import('../views/dashboard/dashboard.vue'),
 				meta: {
-					title: '仪表盘',
-					icon: 'AppstoreOutlined',
-					roles: ['admin', 'guest']
-				}
-			},
-			{
-				path: 'icons',
-				name: 'Icons',
-				component: () => import('../views/icons/icons.vue'),
-				meta: {
-					title: '图标',
-					icon: 'AppstoreOutlined',
+					title: '技术栈',
+					icon: 'MenuOutlined',
 					roles: ['admin', 'guest']
 				}
 			}
+			// {
+			// 	path: 'plot',
+			// 	name: 'Plot',
+			// 	component: () => import('../views/plot/plot.vue'),
+			// 	meta: {
+			// 		title: '图表',
+			// 		icon: 'BarChartOutlined',
+			// 		roles: ['admin', 'guest']
+			// 	}
+			// }
 		]
 	},
 	{
@@ -37,7 +37,7 @@ export default [
 		component: Layout,
 		meta: {
 			title: '表单',
-			icon: '',
+			icon: 'ContainerOutlined',
 			roles: ['admin']
 		},
 		children: [
@@ -47,9 +47,16 @@ export default [
 				component: () => import('../views/form/classic.vue'),
 				meta: {
 					title: '经典表单',
-					icon: ''
+					icon: 'ContainerOutlined'
 				}
 			}
 		]
+	},
+	{
+		// https://next.router.vuejs.org/guide/migration/index.html#removed-star-or-catch-all-routes
+		path: '/:path(.*)*',
+		name: 'NotFound',
+		hidden: true,
+		component: () => import('../views/error/404.vue')
 	}
 ]

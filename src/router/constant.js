@@ -8,11 +8,5 @@ export default [
 		name: 'Login',
 		hidden: true,
 		component: () => import('../views/login/login.vue')
-	},
-	{
-		path: '/404',
-		name: '404',
-		hidden: true,
-		component: () => import('../views/error/404.vue')
 	}
 ]

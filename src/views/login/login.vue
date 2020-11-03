@@ -5,7 +5,7 @@
 <template>
 	<div class="login-box">
 		<div class="form-box">
-			<div class="logo">Vue Next Admin</div>
+			<div class="logo">Vue-Next Admin</div>
 			<a-form :model="form">
 				<a-form-item>
 					<a-input v-model:value="form.username" placeholder="Username">
@@ -39,31 +39,34 @@
 
 <script>
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { reactive, toRefs } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
 	components: {
 		UserOutlined,
 		LockOutlined
 	},
-	data() {
-		return {
+	setup() {
+		const store = useStore()
+		const router = useRouter()
+		const data = reactive({
 			form: {
 				username: 'admin',
 				password: '123456'
 			}
-		}
-	},
-	methods: {
-		handleSubmit(e) {
-			console.log(this.form)
-			this.$store
-				.dispatch('user/login', this.form)
+		})
+		const handleSubmit = () => {
+			store
+				.dispatch('user/login', data.form)
 				.then(() => {
 					console.log('登录成功跳转')
-					this.$router.push('/')
+					router.push('/')
 				})
 				.catch(() => {})
 		}
+		return { ...toRefs(data), handleSubmit }
 	}
 }
 </script>

@@ -5,7 +5,7 @@
 <template>
 	<a-layout class="layout-container">
 		<a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
-			<logo :collapsed="collapsed"></logo>
+			<Logo :collapsed="collapsed" />
 			<a-menu
 				mode="inline"
 				theme="dark"
@@ -18,13 +18,13 @@
 						v-if="!item.children || item.children.length === 0"
 						:key="item.name"
 					>
-						<UserOutlined />
+						<component :is="item.meta.icon" />
 						<span>{{ item.meta.title }}</span>
 					</a-menu-item>
 					<!-- 不显示父级菜单的一组子菜单 -->
 					<template v-else-if="!item.name && item.children.length > 0">
 						<a-menu-item v-for="e in item.children" :key="e.name">
-							<UserOutlined />
+							<component :is="e.meta.icon" />
 							<span>{{ e.meta.title }}</span>
 						</a-menu-item>
 					</template>
@@ -35,32 +35,14 @@
 		<a-layout>
 			<a-layout-header class="header-box">
 				<div class="header-left">
-					<div class="collapse-box">
-						<menu-unfold-outlined
-							v-if="collapsed"
-							class="trigger icon"
-							@click="() => (collapsed = !collapsed)"
-						/>
-						<menu-fold-outlined
-							v-else
-							class="trigger icon"
-							@click="() => (collapsed = !collapsed)"
-						/>
-					</div>
-					<a-breadcrumb style="height: 20px">
-						<a-breadcrumb-item
-							v-for="item in $route.matched.filter(
-								(item) => Object.keys(item.meta).length > 0
-							)"
-							:key="item.path"
-						>
-							{{ item.meta.title ? item.meta.title : '' }}
-						</a-breadcrumb-item>
-					</a-breadcrumb>
+					<Collapse @toggle="collapsed = !collapsed"></Collapse>
+					<Breadcrumb />
 				</div>
 				<div class="header-right">
 					<a-dropdown>
-						<UserOutlined class="icon" />
+						<span class="name-box"
+							>{{ name }}<UserOutlined class="icon" style="margin-left: 5px"
+						/></span>
 						<template v-slot:overlay>
 							<a-menu>
 								<a-menu-item @click="logout"> 退出登录 </a-menu-item>
@@ -71,73 +53,68 @@
 			</a-layout-header>
 			<a-layout-content
 				:style="{
-					margin: '10px',
+					marginTop: '1px',
 					padding: '10px',
 					background: '#fff',
-					minHeight: '280px'
+					minHeight: '280px',
+					overflow: 'auto'
 				}"
 			>
-				<router-view></router-view>
+				<router-view class="app-content"></router-view>
 			</a-layout-content>
 		</a-layout>
 	</a-layout>
 </template>
 <script>
 import {
+	AppstoreOutlined,
+	MenuOutlined,
 	UserOutlined,
-	VideoCameraOutlined,
-	UploadOutlined,
-	MenuUnfoldOutlined,
-	MenuFoldOutlined,
-	AppstoreOutlined
+	BarChartOutlined
 } from '@ant-design/icons-vue'
 import Logo from './logo.vue'
 import SubMenu from './subMenu.vue'
+import Breadcrumb from './breadcrumb.vue'
+import Collapse from './collapse.vue'
+import { computed, getCurrentInstance, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default {
 	components: {
 		AppstoreOutlined,
+		MenuOutlined,
 		UserOutlined,
-		MenuUnfoldOutlined,
-		MenuFoldOutlined,
+		BarChartOutlined,
 		Logo,
-		SubMenu
+		SubMenu,
+		Breadcrumb,
+		Collapse
 	},
-	created() {
-		this.selectedKeys = [this.$route.name]
-		this.openKeys = [this.$route.matched[0].name || '']
-	},
-	watch: {
-		selectedKeys: {
-			deep: true,
-			handler(val) {
-				this.$router.push({ name: val[0] })
-			}
-		}
-	},
-	mounted() {},
-	data() {
-		return {
-			openKeys: [],
-			selectedKeys: [],
-			collapsed: false
-		}
-	},
-	computed: {
-		routes() {
-			return (
-				this.$store.getters.permission_routes.filter((item) => !item.hidden) ||
-				[]
-			)
-		}
-	},
-	methods: {
-		logout() {
-			console.log('退出登录')
-			this.$store.dispatch('user/logout').then(() => {
-				this.$router.push({ name: 'Login' })
+	setup() {
+		const store = useStore()
+		const router = useRouter()
+		const route = useRoute()
+		const name = ref(store.getters.name)
+		const openKeys = ref([route.matched[0].name || ''])
+		const selectedKeys = ref([route.name])
+		const collapsed = ref(false)
+		// 选中跳转
+		watch(selectedKeys, (val) => {
+			router.push({ name: val[0] })
+		})
+		// 获取权限路由
+		const routes = computed(
+			() => store.getters.permission_routes.filter((item) => !item.hidden) || []
+		)
+
+		const logout = () => {
+			store.dispatch('user/logout').then(() => {
+				router.push({ name: 'Login' })
 			})
 		}
+
+		return { name, openKeys, selectedKeys, collapsed, routes, logout }
 	}
 }
 </script>
@@ -156,9 +133,6 @@ export default {
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			.trigger {
-				padding: 0 24px;
-			}
 		}
 		.header-left {
 			display: flex;
@@ -166,12 +140,16 @@ export default {
 			// justify-content: space-between;
 			align-items: center;
 		}
-		.icon {
-			font-size: 18px;
-			cursor: pointer;
-			transition: color 0.3s;
-			&:hover {
-				color: #1890ff;
+		.header-right {
+			.name-box {
+				cursor: pointer;
+				&:hover {
+					color: #1890ff;
+				}
+				.icon {
+					font-size: 18px;
+					transition: color 0.3s;
+				}
 			}
 		}
 	}

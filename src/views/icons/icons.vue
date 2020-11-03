@@ -3,13 +3,17 @@
  * @Date: 2020-10-29 21:23:18
 -->
 <template>
-	<div>
-		<h2>图标</h2>
-	</div>
+	<Icon icon="MenuOutlined"></Icon>
 </template>
 
 <script>
-export default {}
+import Icon from '/@/components/icon.vue'
+
+export default {
+	components: {
+		Icon
+	}
+}
 </script>
 
 <style lang="less" scoped>
