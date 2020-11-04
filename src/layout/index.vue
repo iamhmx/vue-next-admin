@@ -39,9 +39,31 @@
 					<Breadcrumb />
 				</div>
 				<div class="header-right">
-					<a-dropdown>
-						<span class="name-box"
-							>{{ name }}<UserOutlined class="icon" style="margin-left: 5px"
+					<a-popover class="item" title="未读消息" trigger="hover">
+						<template v-slot:content>
+							<div style="max-width: 200px">
+								<a-menu @click="clickMsg">
+									<a-menu-item v-for="m in msg" :key="m.id">
+										{{ m.msg }}
+									</a-menu-item>
+								</a-menu>
+							</div>
+						</template>
+						<a-badge :count="msg.length" :overflow-count="99">
+							<BellOutlined class="icon" style="vertical-align: 2px" />
+						</a-badge>
+					</a-popover>
+					<!-- <div class="item">
+						<a-badge :count="50" :overflow-count="99">
+							<BellOutlined class="icon" />
+						</a-badge>
+					</div> -->
+					<div class="item">
+						<GithubOutlined class="icon" @click="openGithub" />
+					</div>
+					<a-dropdown class="item">
+						<span
+							>{{ name }}<UserOutlined class="icon" style="margin-left: 2px"
 						/></span>
 						<template v-slot:overlay>
 							<a-menu>
@@ -64,13 +86,18 @@
 			</a-layout-content>
 		</a-layout>
 	</a-layout>
+	<a-modal title="消息" v-model:visible="visible" @ok="visible = false">
+		<p>{{ msgText }}</p>
+	</a-modal>
 </template>
 <script>
 import {
 	AppstoreOutlined,
+	GithubOutlined,
 	MenuOutlined,
 	UserOutlined,
-	BarChartOutlined
+	BarChartOutlined,
+	BellOutlined
 } from '@ant-design/icons-vue'
 import Logo from './logo.vue'
 import SubMenu from './subMenu.vue'
@@ -86,6 +113,8 @@ export default {
 		MenuOutlined,
 		UserOutlined,
 		BarChartOutlined,
+		GithubOutlined,
+		BellOutlined,
 		Logo,
 		SubMenu,
 		Breadcrumb,
@@ -99,6 +128,18 @@ export default {
 		const openKeys = ref([route.matched[0].name || ''])
 		const selectedKeys = ref([route.name])
 		const collapsed = ref(false)
+		const visible = ref(false)
+		const msgText = ref('')
+		const msg = ref([
+			{
+				id: 1,
+				msg: '特朗普凌晨在白宫发表讲话：坦白说，我们已经赢了大选'
+			},
+			{
+				id: 2,
+				msg: '特朗普在大部分摇摆州领先 拜登讲话呼吁保持耐心'
+			}
+		])
 		// 选中跳转
 		watch(selectedKeys, (val) => {
 			router.push({ name: val[0] })
@@ -114,7 +155,32 @@ export default {
 			})
 		}
 
-		return { name, openKeys, selectedKeys, collapsed, routes, logout }
+		const openGithub = () => {
+			window.open('https://github.com/iamhmx/vue-next-admin')
+		}
+
+		const clickMsg = ({ key }) => {
+			console.log(
+				'msg item：',
+				msg.value.filter((item) => item.id === key)[0].msg
+			)
+			msgText.value = msg.value.filter((item) => item.id === key)[0].msg
+			visible.value = true
+		}
+
+		return {
+			visible,
+			msgText,
+			name,
+			openKeys,
+			selectedKeys,
+			collapsed,
+			routes,
+			logout,
+			openGithub,
+			msg,
+			clickMsg
+		}
 	}
 }
 </script>
@@ -141,7 +207,11 @@ export default {
 			align-items: center;
 		}
 		.header-right {
-			.name-box {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			.item {
+				margin-left: 15px;
 				cursor: pointer;
 				&:hover {
 					color: #1890ff;
@@ -149,9 +219,20 @@ export default {
 				.icon {
 					font-size: 18px;
 					transition: color 0.3s;
+					cursor: pointer;
+					&:hover {
+						color: #1890ff;
+					}
 				}
 			}
 		}
+	}
+}
+</style>
+<style lang="less">
+.header-right {
+	.ant-badge-count {
+		top: -5px;
 	}
 }
 </style>

@@ -1,19 +1,18 @@
-import router from './router'
-import store from './store'
+import router from './index'
+import store from '../store'
 import { message } from 'ant-design-vue'
-import NProgress from 'nprogress' // progress bar
-import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '/@/utils/auth' // get token from cookie
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import { getToken } from '/@/utils/auth'
 import getPageTitle from '/@/utils/get-page-title'
 
-NProgress.configure({ showSpinner: false }) // NProgress Configuration
+NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login'] // no redirect whitelist
+const whiteList = ['/login'] // 白名单
 
 router.beforeEach(async (to, from, next) => {
 	NProgress.start()
 	document.title = getPageTitle(to.meta.title)
-
 	const hasToken = getToken()
 	if (hasToken) {
 		if (to.path === '/login') {
@@ -27,13 +26,14 @@ router.beforeEach(async (to, from, next) => {
 			} else {
 				try {
 					const { roles } = await store.dispatch('user/getInfo')
-					// generate accessible routes map based on roles
+					// 根据用户角色，动态获取有权限的路由
 					const accessRoutes = await store.dispatch(
 						'permission/generateRoutes',
 						roles
 					)
 					// 动态挂载路由
 					accessRoutes.forEach((route) => {
+						// !在vue-router 4.x中，router.addRoutes已经废弃
 						router.addRoute(route)
 					})
 					// if (router.getRoutes().some(item => item.path === to.path)) {
@@ -47,7 +47,6 @@ router.beforeEach(async (to, from, next) => {
 					// }
 					next({ ...to })
 				} catch (error) {
-					console.log('error：', error)
 					await store.dispatch('user/resetToken')
 					message.error(error || 'Has Error')
 					next(`/login?redirect=${to.path}`)

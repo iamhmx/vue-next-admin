@@ -3,9 +3,9 @@ import App from './App.vue'
 import './index.less'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
-import './permission'
 
 import { setupRouter } from './router/index'
+import './router/permission'
 import { setupStore } from './store/index'
 
 import { setupProdMockServer } from './mockProdServer'

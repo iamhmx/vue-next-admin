@@ -7,8 +7,11 @@
 		<a-list :grid="{ gutter: 16, column: 1 }" :data-source="data">
 			<template v-slot:renderItem="{ item }">
 				<a-list-item class="list-item">
-					<a-card :title="item.title"
-						>{{ item.des }} <a target="_blank" :href="item.url">文档</a>
+					<a-card :title="item.title">
+						<a-skeleton v-if="showSkeleton" active />
+						<template v-else>
+							{{ item.des }} <a target="_blank" :href="item.url">文档</a>
+						</template>
 					</a-card>
 				</a-list-item>
 			</template>
@@ -20,6 +23,10 @@
 import { ref } from 'vue'
 export default {
 	setup() {
+		const showSkeleton = ref(true)
+		setTimeout(() => {
+			showSkeleton.value = false
+		}, 800)
 		const data = ref([
 			{
 				title: 'vue3',
@@ -49,7 +56,7 @@ export default {
 				des: '支持vue3的路由管理工具'
 			}
 		])
-		return { data }
+		return { data, showSkeleton }
 	}
 }
 </script>
@@ -58,7 +65,7 @@ export default {
 .dashboard-box {
 	.ant-card-bordered {
 		&:hover {
-			box-shadow: rgba(@primary-color, 0.8) 0px 0px 3px 3px;
+			box-shadow: rgba(@primary-color, 0.8) 0px 0px 2px 2px;
 			// border-color: @primary-color;
 		}
 	}
